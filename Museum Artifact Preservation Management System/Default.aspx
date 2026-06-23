@@ -1,6 +1,4 @@
-﻿<%@ Page Language="VB" AutoEventWireup="true" CodeBehind="Default.aspx.vb"
-Inherits="Museum_Artifact_Preservation_Management_System.MuseumArtifactPreservation.Default"
-%>
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="Museum_Artifact_Preservation_Management_System.Default" %>
 
 <!DOCTYPE html>
 <html lang="en">
