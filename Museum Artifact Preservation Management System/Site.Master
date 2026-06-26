@@ -1,12 +1,11 @@
-﻿<%@ Master Language="VB" AutoEventWireup="true" CodeBehind="Site.master.vb" Inherits="Museum_Artifact_Preservation_Management_System.SiteMaster" %>
+<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.Master.cs" Inherits="Museum_Artifact_Preservation_Management_System.SiteMaster" %>
 
 <!DOCTYPE html>
-
 <html lang="en">
 <head runat="server">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%: Page.Title %> - My ASP.NET Application</title>
+    <title><%: Page.Title %> - MAPM System</title>
 
     <asp:PlaceHolder runat="server">
         <%: Scripts.Render("~/bundles/modernizr") %>
@@ -14,14 +13,645 @@
 
     <webopt:bundlereference runat="server" path="~/Content/css" />
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 
+    <style>
+        :root {
+            --primary: #0f172a;
+            --primary-light: #1e293b;
+            --accent: #d97706;
+            --accent-hover: #b45309;
+            --success: #059669;
+            --warning: #eab308;
+            --danger: #dc2626;
+            --info: #06b6d4;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --sidebar-width: 280px;
+            --header-height: 70px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Topbar Header */
+        .topbar {
+            background-color: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            height: var(--header-height);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: #ffffff;
+        }
+
+        .brand i {
+            font-size: 1.8rem;
+            color: var(--accent);
+            text-shadow: 0 0 10px rgba(217, 119, 6, 0.4);
+        }
+
+        .brand-text {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s ease;
+        }
+
+        .user-profile:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent);
+        }
+
+        .user-profile i {
+            color: var(--accent);
+        }
+
+        .logout-btn {
+            color: #f1f5f9;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 8px 16px;
+            border-radius: 8px;
+            background-color: rgba(220, 38, 38, 0.2);
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            background-color: var(--danger);
+            border-color: var(--danger);
+            transform: translateY(-1px);
+        }
+
+        /* Layout Main wrapper */
+        .wrapper {
+            display: flex;
+            padding-top: var(--header-height);
+            min-height: 100vh;
+            flex: 1;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--primary);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            position: fixed;
+            top: var(--header-height);
+            bottom: 0;
+            left: 0;
+            overflow-y: auto;
+            z-index: 90;
+            padding: 20px 0;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .sidebar-section {
+            margin-bottom: 24px;
+        }
+
+        .sidebar-section-title {
+            padding: 0 24px 8px 24px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidebar-section-title i {
+            font-size: 0.8rem;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 24px;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-left: 4px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-nav a:hover {
+            color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.03);
+            border-left-color: rgba(217, 119, 6, 0.5);
+            padding-left: 28px;
+        }
+
+        .sidebar-nav a.active {
+            color: #ffffff;
+            background-color: rgba(217, 119, 6, 0.1);
+            border-left-color: var(--accent);
+            font-weight: 600;
+        }
+
+        .sidebar-nav i {
+            width: 18px;
+            text-align: center;
+            color: var(--accent);
+            font-size: 0.95rem;
+        }
+
+        /* Content Container */
+        .content-area {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 40px;
+            background-color: var(--bg-main);
+            min-height: calc(100vh - var(--header-height));
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Component Styles */
+        .page-header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-title i {
+            color: var(--accent);
+        }
+
+        /* Cards & Stats */
+        .card {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+        }
+
+        .card-header {
+            background-color: #fafafa;
+            padding: 16px 24px;
+            font-weight: 700;
+            border-bottom: 1px solid var(--border);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            border-left: 6px solid var(--accent);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+        }
+
+        .stat-card-primary { border-left-color: var(--accent); }
+        .stat-card-success { border-left-color: var(--success); }
+        .stat-card-warning { border-left-color: var(--warning); }
+        .stat-card-danger { border-left-color: var(--danger); }
+        .stat-card-info { border-left-color: var(--info); }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--primary);
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .stat-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .stat-trend {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 600;
+        }
+
+        .trend-up { color: var(--success); }
+        .trend-down { color: var(--danger); }
+
+        /* Tables & Grids */
+        .table-container {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            width: 100%;
+        }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .custom-table th {
+            background-color: #f8fafc;
+            color: var(--primary);
+            font-weight: 700;
+            padding: 16px 20px;
+            font-size: 0.85rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .custom-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+            color: var(--text-main);
+            vertical-align: middle;
+        }
+
+        .custom-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .custom-table tr {
+            transition: background-color 0.2s ease;
+        }
+
+        .custom-table tr:hover {
+            background-color: #f1f5f9;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            border: 1px solid transparent;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-light);
+            border-color: var(--primary-light);
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25);
+        }
+
+        .btn-accent {
+            background-color: var(--accent);
+            color: #ffffff;
+            border-color: var(--accent);
+        }
+
+        .btn-accent:hover {
+            background-color: var(--accent-hover);
+            border-color: var(--accent-hover);
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);
+        }
+
+        .btn-secondary {
+            background-color: #ffffff;
+            color: var(--primary);
+            border-color: var(--border);
+        }
+
+        .btn-secondary:hover {
+            background-color: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .btn-success { background-color: var(--success); color: #ffffff; }
+        .btn-success:hover { background-color: #047857; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25); }
+
+        .btn-danger { background-color: var(--danger); color: #ffffff; }
+        .btn-danger:hover { background-color: #b91c1c; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25); }
+
+        .btn-warning { background-color: var(--warning); color: #000000; }
+        .btn-warning:hover { background-color: #ca8a04; }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            border-radius: 6px;
+        }
+
+        /* Filter Panel */
+        .filter-panel {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-success { background-color: rgba(5, 150, 105, 0.15); color: var(--success); }
+        .badge-danger { background-color: rgba(220, 38, 38, 0.15); color: var(--danger); }
+        .badge-warning { background-color: rgba(234, 179, 8, 0.15); color: #a16207; }
+        .badge-info { background-color: rgba(6, 182, 212, 0.15); color: #0891b2; }
+
+        /* Forms */
+        .form-container {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 30px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            max-width: 900px;
+        }
+
+        .form-section {
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .form-section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-section-title i {
+            color: var(--accent);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--primary);
+        }
+
+        .form-label .required {
+            color: var(--danger);
+        }
+
+        .form-control, .form-select, textarea {
+            font-family: inherit;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-size: 0.95rem;
+            color: var(--text-main);
+            background-color: #ffffff;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus, .form-select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
+        }
+
+        /* Alert Banners */
+        .alert-banner {
+            padding: 16px 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 24px;
+            border-left: 4px solid transparent;
+            font-size: 0.95rem;
+        }
+
+        .alert-banner i {
+            font-size: 1.15rem;
+            margin-top: 2px;
+        }
+
+        .alert-banner-danger {
+            background-color: rgba(220, 38, 38, 0.08);
+            border-left-color: var(--danger);
+            color: #991b1b;
+        }
+
+        .alert-banner-warning {
+            background-color: rgba(234, 179, 8, 0.08);
+            border-left-color: var(--warning);
+            color: #854d0e;
+        }
+
+        .alert-banner-info {
+            background-color: rgba(6, 182, 212, 0.08);
+            border-left-color: var(--info);
+            color: #155e75;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--primary);
+            padding: 20px 24px;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: auto;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 1024px) {
+            :root {
+                --sidebar-width: 0px;
+            }
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            .sidebar.active {
+                transform: translateX(0);
+                width: 280px;
+                --sidebar-width: 280px;
+            }
+            .content-area {
+                margin-left: 0;
+            }
+        }
+    </style>
 </head>
 <body>
     <form runat="server">
         <asp:ScriptManager runat="server">
             <Scripts>
-                <%--To learn more about bundling scripts in ScriptManager see https://go.microsoft.com/fwlink/?LinkID=301884 --%>
-                <%--Framework Scripts--%>
                 <asp:ScriptReference Name="MsAjaxBundle" />
                 <asp:ScriptReference Name="jquery" />
                 <asp:ScriptReference Name="WebForms.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebForms.js" />
@@ -33,37 +663,148 @@
                 <asp:ScriptReference Name="WebParts.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebParts.js" />
                 <asp:ScriptReference Name="Focus.js" Assembly="System.Web" Path="~/Scripts/WebForms/Focus.js" />
                 <asp:ScriptReference Name="WebFormsBundle" />
-                <%--Site Scripts--%>
             </Scripts>
         </asp:ScriptManager>
 
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark">
-            <div class="container">
-                <a class="navbar-brand" runat="server" href="~/">Application name</a>
-                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Toggle navigation" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item"><a class="nav-link" runat="server" href="~/">Home</a></li>
-                        <li class="nav-item"><a class="nav-link" runat="server" href="~/About">About</a></li>
-                        <li class="nav-item"><a class="nav-link" runat="server" href="~/Contact">Contact</a></li>
+        <!-- Topbar -->
+        <header class="topbar">
+            <a href="~/Dashboard/Dashboard.aspx" class="brand" runat="server">
+                <i class="fas fa-university"></i>
+                <span class="brand-text">MAPM System</span>
+            </a>
+            <div class="topbar-right">
+                <a href="~/Settings/UserProfile.aspx" class="user-profile" runat="server">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Dr. Sarah Jenkins</span>
+                </a>
+                <a href="~/Account/Login.aspx" class="logout-btn" runat="server">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </header>
+
+        <!-- Wrapper -->
+        <div class="wrapper">
+            <!-- Sidebar Navigation -->
+            <aside class="sidebar" id="sidebarMenu">
+                <!-- Main Section -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title"><i class="fas fa-bars"></i> Main Console</div>
+                    <ul class="sidebar-nav">
+                        <li><a href="~/Dashboard/Dashboard.aspx" id="nav_dashboard" runat="server"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                        <li><a href="~/Search/AdvancedSearch.aspx" id="nav_search" runat="server"><i class="fas fa-search"></i> Advanced Search</a></li>
                     </ul>
                 </div>
-            </div>
-        </nav>
-        <div class="container body-content">
-            <asp:ContentPlaceHolder ID="MainContent" runat="server">
-            </asp:ContentPlaceHolder>
-            <hr />
-            <footer>
-                <p>&copy; <%: DateTime.Now.Year %> - My ASP.NET Application</p>
-            </footer>
+
+                <!-- Artifact Management -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title"><i class="fas fa-box"></i> Collections</div>
+                    <ul class="sidebar-nav">
+                        <li><a href="~/Artifacts/ArtifactList.aspx" id="nav_artifacts_list" runat="server"><i class="fas fa-list"></i> Artifact List</a></li>
+                        <li><a href="~/Artifacts/AddArtifact.aspx" id="nav_artifacts_add" runat="server"><i class="fas fa-plus-circle"></i> Add Artifact</a></li>
+                        <li><a href="~/Artifacts/CategoryManagement.aspx" id="nav_categories" runat="server"><i class="fas fa-tags"></i> Categories</a></li>
+                        <li><a href="~/Artifacts/HighValueArtifacts.aspx" id="nav_high_value" runat="server"><i class="fas fa-gem"></i> High Value Tracking</a></li>
+                    </ul>
+                </div>
+
+                <!-- Preservation Management -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title"><i class="fas fa-shield-alt"></i> Preservation</div>
+                    <ul class="sidebar-nav">
+                        <li><a href="~/Condition/DamageReports.aspx" id="nav_damage" runat="server"><i class="fas fa-exclamation-triangle"></i> Damage Reports</a></li>
+                        <li><a href="~/Condition/ConditionStatus.aspx" id="nav_condition" runat="server"><i class="fas fa-heartbeat"></i> Condition Status</a></li>
+                    </ul>
+                </div>
+
+                <!-- Operations -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title"><i class="fas fa-tasks"></i> Operations</div>
+                    <ul class="sidebar-nav">
+                        <li><a href="~/Exhibitions/ExhibitionList.aspx" id="nav_exhibitions" runat="server"><i class="fas fa-images"></i> Exhibitions</a></li>
+                        <li><a href="~/Exhibitions/CreateExhibition.aspx" id="nav_exhibitions_create" runat="server"><i class="fas fa-plus-circle"></i> Create Exhibition</a></li>
+                        <li><a href="~/Exhibitions/ExhibitionHistory.aspx" id="nav_exhibitions_history" runat="server"><i class="fas fa-history"></i> Exhibition History</a></li>
+                    </ul>
+                </div>
+
+                <!-- Loans & Transfers -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title"><i class="fas fa-exchange-alt"></i> Loans & Transfers</div>
+                    <ul class="sidebar-nav">
+                        <li><a href="~/Loans/LoanList.aspx" id="nav_loans" runat="server"><i class="fas fa-handshake"></i> Active Loans</a></li>
+                        <li><a href="~/Loans/CreateLoan.aspx" id="nav_loans_create" runat="server"><i class="fas fa-plus-circle"></i> Create Loan</a></li>
+                        <li><a href="~/Loans/OverdueLoans.aspx" id="nav_loans_overdue" runat="server"><i class="fas fa-clock"></i> Overdue Loans</a></li>
+                    </ul>
+                </div>
+
+                <!-- Logistics & Safety -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title"><i class="fas fa-warehouse"></i> Storage & Logistics</div>
+                    <ul class="sidebar-nav">
+                        <li><a href="~/Storage/StorageLocations.aspx" id="nav_storage" runat="server"><i class="fas fa-map-marker-alt"></i> Storage Locations</a></li>
+                        <li><a href="~/Storage/ArtifactMovement.aspx" id="nav_movement" runat="server"><i class="fas fa-arrows-alt"></i> Movement Logs</a></li>
+                    </ul>
+                </div>
+
+                <!-- Conservation & Repairs -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title"><i class="fas fa-tools"></i> Conservation</div>
+                    <ul class="sidebar-nav">
+                        <li><a href="~/Restoration/RestorationRecords.aspx" id="nav_restoration" runat="server"><i class="fas fa-clipboard"></i> Restoration Records</a></li>
+                        <li><a href="~/Restoration/MaintenanceSchedule.aspx" id="nav_maintenance" runat="server"><i class="fas fa-calendar-alt"></i> Maintenance Schedule</a></li>
+                        <li><a href="~/Restoration/RestorationNeeded.aspx" id="nav_restoration_needed" runat="server"><i class="fas fa-exclamation-circle"></i> Priority restoration</a></li>
+                    </ul>
+                </div>
+
+                <!-- Finance & Insurance -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title"><i class="fas fa-calculator"></i> Valuations</div>
+                    <ul class="sidebar-nav">
+                        <li><a href="~/Insurance/ValuationRecords.aspx" id="nav_valuation" runat="server"><i class="fas fa-chart-pie"></i> Valuation Logs</a></li>
+                        <li><a href="~/Insurance/InsurancePolicies.aspx" id="nav_insurance" runat="server"><i class="fas fa-certificate"></i> Policies</a></li>
+                    </ul>
+                </div>
+
+                <!-- User Management & Security -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title"><i class="fas fa-user-shield"></i> Administration</div>
+                    <ul class="sidebar-nav">
+                        <li><a href="~/Staff/StaffManagement.aspx" id="nav_staff" runat="server"><i class="fas fa-users"></i> Staff Directory</a></li>
+                        <li><a href="~/Staff/RoleManagement.aspx" id="nav_roles" runat="server"><i class="fas fa-user-check"></i> Role Permissions</a></li>
+                        <li><a href="~/Settings/SystemSettings.aspx" id="nav_settings" runat="server"><i class="fas fa-cogs"></i> System Settings</a></li>
+                        <li><a href="~/Settings/UserProfile.aspx" id="nav_profile" runat="server"><i class="fas fa-user-cog"></i> Profile Settings</a></li>
+                    </ul>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="content-area">
+                <asp:ContentPlaceHolder ID="MainContent" runat="server" />
+            </main>
         </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; <%: DateTime.Now.Year %> - Museum Artifact Preservation Management System (MAPM) | Curatorial Administration Portal</p>
+        </footer>
     </form>
-    <asp:PlaceHolder runat="server">
-        <%: Scripts.Render("~/Scripts/bootstrap.js") %>
-    </asp:PlaceHolder>
+
+    <script>
+        // Set active navigation element based on current path
+        document.addEventListener("DOMContentLoaded", function () {
+            const currentPath = window.location.pathname.toLowerCase();
+            const navLinks = document.querySelectorAll(".sidebar-nav a");
+            
+            navLinks.forEach(link => {
+                const href = link.getAttribute("href");
+                if (href) {
+                    // Convert relative/absolute paths
+                    const cleanHref = href.replace(/^~\//, "/").toLowerCase();
+                    if (currentPath.endsWith(cleanHref) || currentPath.indexOf(cleanHref) !== -1 && cleanHref !== "/") {
+                        link.classList.add("active");
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 </html>
