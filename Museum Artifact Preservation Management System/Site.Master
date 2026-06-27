@@ -15,6 +15,7 @@
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script src="<%= ResolveUrl("~/Scripts/auth-guard.js") %>" defer></script>
 
     <style>
         :root {
@@ -126,12 +127,34 @@
             background-color: rgba(220, 38, 38, 0.2);
             border: 1px solid rgba(220, 38, 38, 0.3);
             transition: all 0.2s ease;
+            cursor: pointer;
+            font-family: inherit;
         }
 
         .logout-btn:hover {
             background-color: var(--danger);
             border-color: var(--danger);
             transform: translateY(-1px);
+        }
+
+        /* Role badge in topbar */
+        .role-badge {
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 3px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+        .role-badge--admin {
+            background: rgba(217,119,6,0.2);
+            border: 1px solid rgba(217,119,6,0.5);
+            color: #fbbf24;
+        }
+        .role-badge--user {
+            background: rgba(14,165,233,0.15);
+            border: 1px solid rgba(14,165,233,0.4);
+            color: #7dd3fc;
         }
 
         /* Layout Main wrapper */
@@ -673,13 +696,14 @@
                 <span class="brand-text">MAPM System</span>
             </a>
             <div class="topbar-right">
-                <a href="~/Settings/UserProfile.aspx" class="user-profile" runat="server">
+                <span id="roleIndicator" class="role-badge role-badge--admin">Admin</span>
+                <a href="#" class="user-profile" id="topbarProfileLink" onclick="goToProfile(); return false;">
                     <i class="fas fa-user-circle"></i>
-                    <span>Dr. Sarah Jenkins</span>
+                    <span id="topbarEmail">Administrator</span>
                 </a>
-                <a href="~/Account/Login.aspx" class="logout-btn" runat="server">
+                <button type="button" class="logout-btn" onclick="mapmLogout()">
                     <i class="fas fa-sign-out-alt"></i> Logout
-                </a>
+                </button>
             </div>
         </header>
 
@@ -701,14 +725,14 @@
                     <div class="sidebar-section-title"><i class="fas fa-box"></i> Collections</div>
                     <ul class="sidebar-nav">
                         <li><a href="~/Artifacts/ArtifactList.aspx" id="nav_artifacts_list" runat="server"><i class="fas fa-list"></i> Artifact List</a></li>
-                        <li><a href="~/Artifacts/AddArtifact.aspx" id="nav_artifacts_add" runat="server"><i class="fas fa-plus-circle"></i> Add Artifact</a></li>
-                        <li><a href="~/Artifacts/CategoryManagement.aspx" id="nav_categories" runat="server"><i class="fas fa-tags"></i> Categories</a></li>
-                        <li><a href="~/Artifacts/HighValueArtifacts.aspx" id="nav_high_value" runat="server"><i class="fas fa-gem"></i> High Value Tracking</a></li>
+                        <li class="admin-nav-item"><a href="~/Artifacts/AddArtifact.aspx" id="nav_artifacts_add" runat="server"><i class="fas fa-plus-circle"></i> Add Artifact</a></li>
+                        <li class="admin-nav-item"><a href="~/Artifacts/CategoryManagement.aspx" id="nav_categories" runat="server"><i class="fas fa-tags"></i> Categories</a></li>
+                        <li class="admin-nav-item"><a href="~/Artifacts/HighValueArtifacts.aspx" id="nav_high_value" runat="server"><i class="fas fa-gem"></i> High Value Tracking</a></li>
                     </ul>
                 </div>
 
-                <!-- Preservation Management -->
-                <div class="sidebar-section">
+                <!-- Preservation Management (admin only) -->
+                <div class="sidebar-section admin-only">
                     <div class="sidebar-section-title"><i class="fas fa-shield-alt"></i> Preservation</div>
                     <ul class="sidebar-nav">
                         <li><a href="~/Condition/DamageReports.aspx" id="nav_damage" runat="server"><i class="fas fa-exclamation-triangle"></i> Damage Reports</a></li>
@@ -721,13 +745,13 @@
                     <div class="sidebar-section-title"><i class="fas fa-tasks"></i> Operations</div>
                     <ul class="sidebar-nav">
                         <li><a href="~/Exhibitions/ExhibitionList.aspx" id="nav_exhibitions" runat="server"><i class="fas fa-images"></i> Exhibitions</a></li>
-                        <li><a href="~/Exhibitions/CreateExhibition.aspx" id="nav_exhibitions_create" runat="server"><i class="fas fa-plus-circle"></i> Create Exhibition</a></li>
-                        <li><a href="~/Exhibitions/ExhibitionHistory.aspx" id="nav_exhibitions_history" runat="server"><i class="fas fa-history"></i> Exhibition History</a></li>
+                        <li class="admin-nav-item"><a href="~/Exhibitions/CreateExhibition.aspx" id="nav_exhibitions_create" runat="server"><i class="fas fa-plus-circle"></i> Create Exhibition</a></li>
+                        <li class="admin-nav-item"><a href="~/Exhibitions/ExhibitionHistory.aspx" id="nav_exhibitions_history" runat="server"><i class="fas fa-history"></i> Exhibition History</a></li>
                     </ul>
                 </div>
 
-                <!-- Loans & Transfers -->
-                <div class="sidebar-section">
+                <!-- Loans & Transfers (admin only) -->
+                <div class="sidebar-section admin-only">
                     <div class="sidebar-section-title"><i class="fas fa-exchange-alt"></i> Loans & Transfers</div>
                     <ul class="sidebar-nav">
                         <li><a href="~/Loans/LoanList.aspx" id="nav_loans" runat="server"><i class="fas fa-handshake"></i> Active Loans</a></li>
@@ -736,8 +760,8 @@
                     </ul>
                 </div>
 
-                <!-- Logistics & Safety -->
-                <div class="sidebar-section">
+                <!-- Storage & Logistics (admin only) -->
+                <div class="sidebar-section admin-only">
                     <div class="sidebar-section-title"><i class="fas fa-warehouse"></i> Storage & Logistics</div>
                     <ul class="sidebar-nav">
                         <li><a href="~/Storage/StorageLocations.aspx" id="nav_storage" runat="server"><i class="fas fa-map-marker-alt"></i> Storage Locations</a></li>
@@ -745,8 +769,8 @@
                     </ul>
                 </div>
 
-                <!-- Conservation & Repairs -->
-                <div class="sidebar-section">
+                <!-- Conservation (admin only) -->
+                <div class="sidebar-section admin-only">
                     <div class="sidebar-section-title"><i class="fas fa-tools"></i> Conservation</div>
                     <ul class="sidebar-nav">
                         <li><a href="~/Restoration/RestorationRecords.aspx" id="nav_restoration" runat="server"><i class="fas fa-clipboard"></i> Restoration Records</a></li>
@@ -755,8 +779,8 @@
                     </ul>
                 </div>
 
-                <!-- Finance & Insurance -->
-                <div class="sidebar-section">
+                <!-- Finance & Insurance (admin only) -->
+                <div class="sidebar-section admin-only">
                     <div class="sidebar-section-title"><i class="fas fa-calculator"></i> Valuations</div>
                     <ul class="sidebar-nav">
                         <li><a href="~/Insurance/ValuationRecords.aspx" id="nav_valuation" runat="server"><i class="fas fa-chart-pie"></i> Valuation Logs</a></li>
@@ -764,8 +788,8 @@
                     </ul>
                 </div>
 
-                <!-- User Management & Security -->
-                <div class="sidebar-section">
+                <!-- Administration (admin only) -->
+                <div class="sidebar-section admin-only">
                     <div class="sidebar-section-title"><i class="fas fa-user-shield"></i> Administration</div>
                     <ul class="sidebar-nav">
                         <li><a href="~/Staff/StaffManagement.aspx" id="nav_staff" runat="server"><i class="fas fa-users"></i> Staff Directory</a></li>
