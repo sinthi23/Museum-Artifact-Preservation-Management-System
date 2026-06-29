@@ -41,11 +41,12 @@
             background: var(--bg-deep);
             min-height: 100vh;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
-            padding: 24px 16px;
+            padding: 40px 16px 60px;
             position: relative;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
         }
 
         /* ── Starfield canvas ── */
@@ -54,6 +55,11 @@
             inset: 0;
             pointer-events: none;
             z-index: 0;
+        }
+
+        /* Center card vertically when viewport is tall enough */
+        @media (min-height: 780px) {
+            body { align-items: center; }
         }
 
         /* ── Ambient glows ── */
@@ -648,7 +654,7 @@
 
     <!-- ── Submit ──────────────────────────────── -->
     <button type="button" class="btn-submit" id="btnSubmit" onclick="validateLogin()">
-        <i class="fas fa-dungeon" style="margin-right:10px;"></i>Enter the Archive
+        <i class="fas fa-right-to-bracket" style="margin-right:10px;"></i>Sign In
     </button>
 
     <!-- ── Register link ───────────────────────── -->
@@ -658,8 +664,6 @@
 
 </div>
 </form>
-
-<div class="version-badge">MAPM &nbsp;·&nbsp; v2.0 &nbsp;·&nbsp; Secure Portal</div>
 
 <script>
     /* ═══════════════════════════════════════════
@@ -739,7 +743,7 @@
             hintU.style.display = 'none';
             pwLabel.textContent = 'Access Code';
             document.getElementById('txtPassword').placeholder = 'Enter access code';
-            btn.innerHTML = '<i class="fas fa-shield-halved" style="margin-right:10px;"></i>Admin — Enter the Archive';
+            btn.innerHTML = '<i class="fas fa-shield-halved" style="margin-right:10px;"></i>Sign In as Admin';
         } else {
             card.classList.add('user-mode');
             tabU.classList.add('active');
@@ -748,7 +752,7 @@
             hintU.style.display = 'flex';
             pwLabel.textContent = 'Password';
             document.getElementById('txtPassword').placeholder = 'Enter your password';
-            btn.innerHTML = '<i class="fas fa-user-graduate" style="margin-right:10px;"></i>User — Enter the Archive';
+            btn.innerHTML = '<i class="fas fa-user-graduate" style="margin-right:10px;"></i>Sign In as Staff';
         }
     }
 
